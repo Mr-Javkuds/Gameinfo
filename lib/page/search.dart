@@ -22,7 +22,7 @@ class _search_pageState extends State<search_page> {
   GamenoFilter? gamenofilter;
   TextEditingController _searchController = TextEditingController();
 
-  Future<void> _runFilters(String value) async {
+  Future<void> _runFilters( value) async {
     try {
       final response = await API_SERVICE().getFilter(value: value);
       setState(() {

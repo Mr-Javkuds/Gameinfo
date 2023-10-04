@@ -64,7 +64,7 @@ class API_SERVICE{
       print('model test genre') ;
 
       GameGenre model = GameGenre.fromJson(json.decode(response.body));
-      print(model?.results[1].name??'') ;
+      print(model?.results[1].name??0) ;
       return model;
     } else {
       throw Exception('Failed to fetch data from API');
@@ -85,7 +85,8 @@ class API_SERVICE{
       print(response.body) ;
       print('model test filter') ;
       GameFilter model = GameFilter.fromJson(json.decode(response.body));
-      print(model?.results?[1].slug.toString()??'null') ;
+      print(query);
+      print(model?.results?[2].name??'null') ;
       return model;
     } else {
       throw Exception('Failed to fetch data from API');
