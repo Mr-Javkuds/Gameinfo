@@ -1,4 +1,4 @@
-final String tableFavorite = 'news  ';
+final String tableFavorite = 'favTable  ';
 
 class Favorite {
   static final List<String> values = [id, image, name, slug, released, rating, idDetail];

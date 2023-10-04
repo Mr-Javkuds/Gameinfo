@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gaminfo/DB/DB_favorit.dart';
 import 'package:gaminfo/model/game_fav.dart';
 import 'package:gaminfo/model/game_list.dart';
+import 'package:gaminfo/page/Tabbar.dart';
 import 'package:gaminfo/page/detail.dart';
 import 'package:gaminfo/page/home.dart';
 import 'package:gaminfo/utils/rounded_image.dart';
@@ -58,9 +59,12 @@ class _FavoritesState extends State<Favorites> {
         await read(); // Tambahkan await di sini
         Navigator.pop(context); // Pindahkan ini ke atas await read()
         Navigator.of(context, rootNavigator: true).pop('dialog');
+        Navigator.pop(context);
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => home()));
+            context, MaterialPageRoute(builder: (context) => Tabbar(halamanke: 0,)));
+
       },
+
     );
 
     AlertDialog alert = AlertDialog(

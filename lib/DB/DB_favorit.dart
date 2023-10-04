@@ -39,11 +39,10 @@ class Fav_DB {
 
   }
 
-  Future<FavoriteModel> create(FavoriteModel news) async {
+  Future<FavoriteModel> create(FavoriteModel favTable) async {
     final db = await instance.database;
-
-    final id = await db.insert(tableFavorite, news.toJson());
-    return news.copy(id: id);
+    final id = await db.insert(tableFavorite, favTable.toJson());
+    return favTable.copy(id: id);
   }
 
   Future<bool> read(String? name) async {

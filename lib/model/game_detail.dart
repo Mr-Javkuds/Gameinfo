@@ -4,11 +4,11 @@
 
 import 'dart:convert';
 
-GameDetail gameDetailFromJson(String str) => GameDetail.fromJson(json.decode(str));
+Game_detail gameDetailFromJson(String str) => Game_detail.fromJson(json.decode(str));
 
-String gameDetailToJson(GameDetail data) => json.encode(data.toJson());
+String gameDetailToJson(Game_detail data) => json.encode(data.toJson());
 
-class GameDetail {
+class Game_detail {
   int id;
   String slug;
   String name;
@@ -64,7 +64,7 @@ class GameDetail {
   dynamic clip;
   String descriptionRaw;
 
-  GameDetail({
+  Game_detail({
     required this.id,
     required this.slug,
     required this.name,
@@ -121,7 +121,7 @@ class GameDetail {
     required this.descriptionRaw,
   });
 
-  factory GameDetail.fromJson(Map<String, dynamic> json) => GameDetail(
+  factory Game_detail.fromJson(Map<String, dynamic> json) => Game_detail(
     id: json["id"],
     slug: json["slug"],
     name: json["name"],

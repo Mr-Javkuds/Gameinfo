@@ -21,7 +21,7 @@ class detail extends StatefulWidget {
 class _detailState extends State<detail> {
 
   bool isloaded = false; // Inisialisasi dengan false pada awalnya
-  GameDetail? gameDetail;
+  Game_detail? gameDetail;
   FavoriteModel? favorite;
   bool checkExist = false;
   Color colorChecked = Colors.red;

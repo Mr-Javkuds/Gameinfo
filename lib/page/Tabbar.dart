@@ -5,12 +5,16 @@ import 'package:gaminfo/page/search.dart';
 import 'home.dart';
 
 class Tabbar extends StatefulWidget {
+  const Tabbar({super.key, required this.halamanke});
+  final int halamanke;
   @override
   _TabbarState createState() => _TabbarState();
+
 }
 
 class _TabbarState extends State<Tabbar> {
-  int _currentIndex = 0;
+  late PageController _pageController;
+  int selectedIndex = 0;
 
   // Daftar halaman yang akan ditampilkan ketika item bottom navigation dipilih.
   final List<Widget> _pages = [
@@ -23,16 +27,41 @@ class _TabbarState extends State<Tabbar> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    int requestindex=widget.halamanke;
+    print( "nilai awal selectedIndex $selectedIndex");
+    switch(requestindex){
+      case 0:selectedIndex=selectedIndex; break;
+      case 1:selectedIndex= selectedIndex+ widget.halamanke;break;
+      case 2:selectedIndex= selectedIndex+ widget.halamanke;break;
+      case 3:selectedIndex= selectedIndex+ widget.halamanke;break;
+
+    }
+    print( "selectedIndex $selectedIndex");
+
+    _pageController = PageController(initialPage: widget.halamanke);
+  }
+  void onButtonPressed(int index) {
+    print(index);
+    setState(() {
+      selectedIndex = index;
+      print("selected index :$selectedIndex");
+      print("selected index 2:$selectedIndex");
+
+    });
+    _pageController.animateToPage(selectedIndex,
+        duration: const Duration(milliseconds: 400), curve: Curves.easeOutQuad);
+  }
+
+  @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-      body: _pages[_currentIndex], // Menampilkan halaman sesuai dengan indeks yang dipilih.
+      body: _pages[selectedIndex], // Menampilkan halaman sesuai dengan indeks yang dipilih.
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (int index) {
-          setState(() {
-            _currentIndex = index; // Mengganti halaman saat item dipilih.
-          });
-        },
+        currentIndex: selectedIndex,
+        onTap:onButtonPressed,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),

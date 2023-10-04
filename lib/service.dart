@@ -45,7 +45,7 @@ class API_SERVICE{
       print(response.body) ;
       print('model test detail') ;
 
-      GameDetail model = GameDetail.fromJson(json.decode(response.body));
+      Game_detail model = Game_detail.fromJson(json.decode(response.body));
       print(model!.name.toString()??'') ;
       return model;
     } else {
