@@ -76,7 +76,7 @@ class API_SERVICE{
 
       String query = value??"";
     //  https://api.rawg.io/api/games?search=&key=91131b2d0342499dbc6180fbdbc72d3b
-    String url2=BASE_URL+'/games?search='+query+'&'+API_KEY;
+    String url2=BASE_URL+'/games?search=$query'+'&'+API_KEY;
     print(url2.toString());
     print('kueri :'+query);
     final response = await http.get(Uri.parse(url2));
@@ -84,9 +84,11 @@ class API_SERVICE{
       print(response.statusCode) ;
       print(response.body) ;
       print('model test filter') ;
+      print(query);
       GameFilter model = GameFilter.fromJson(json.decode(response.body));
       print(query);
-      print(model?.results?[2].name??'null') ;
+      print(response.body);
+      print(model!.results?[1].slug.toString()??'null') ;
       return model;
     } else {
       throw Exception('Failed to fetch data from API');
@@ -103,7 +105,7 @@ class API_SERVICE{
       print(response.statusCode) ;
       print(response.body) ;
       print('model test filter') ;
-      GamenoFilter model = GamenoFilter.fromJson(json.decode(response.body));
+      Gamenofilter model = Gamenofilter.fromJson(json.decode(response.body));
       print(model?.results?[1].slug.toString()??'null') ;
       return model;
     } else {

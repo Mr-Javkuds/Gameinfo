@@ -16,43 +16,65 @@ class search_page extends StatefulWidget {
 }
 
 class _search_pageState extends State<search_page> {
-  bool isLoaded = false;
-  GameFilter? gamefilter;
-  GameList? gamelist;
-  GamenoFilter? gamenofilter;
-  TextEditingController _searchController = TextEditingController();
+  bool isloading = false;
 
-  Future<void> _runFilters( value) async {
-    try {
-      final response = await API_SERVICE().getFilter(value: value);
+  GameFilter? gamefilter;
+  Gamenofilter? gamenofilter;
+
+  List<Map<String, dynamic>> allData = [];
+  List<Map<String, dynamic>>filteredData = [];
+
+  Future<void> getdata() async {
+
+    gamenofilter = await API_SERVICE().getnoFilter();
+    if (gamenofilter != null) {
+      allData = gamenofilter!.results?.map((data) {
+        return {
+          'id': data.id.toString(),
+          'name': data.name.toString(),
+          'slug': data.slug.toString(),
+          'rating': data.rating.toString(),
+          'released': data.released.toString(),
+          'image': data.backgroundImage.toString(),
+        };
+      }).toList() ?? [];
+      filteredData = allData;
+    }else{
       setState(() {
-        gamefilter = response;
-        isLoaded = true;
+        isloading = false;
       });
-    } catch (e) {
-      print('Error: $e');
-      // Handle error here
     }
   }
 
-  Future getdata() async {
-    gamelist = await API_SERVICE().getGamelist();
+  Future<void> _searchFilter(String value) async {
+    List<Map<String, dynamic>> results = [];
+      results = allData
+          .where((user) =>
+          user["name"].toLowerCase().contains(value.toLowerCase()))
+          .toList();
+
     setState(() {
-      isLoaded = true;
+      filteredData = results;
     });
   }
 
-
   @override
   void initState() {
-    super.initState();
-    print(_searchController.text);
+
     getdata();
+    _searchFilter("");
+    super.initState();
+    // Pemanggilan ini akan menampilkan semua data saat halaman pertama kali dibuka.
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    var check = _searchController.text == '' ? false : true;
+ //   var check = _searchController.text == '' ? false : true;
 
 
     return Scaffold(
@@ -75,11 +97,8 @@ class _search_pageState extends State<search_page> {
               padding: EdgeInsets.all(8.0),
               child: Card(
                 child: TextField(
-                  controller: _searchController,
-                  onChanged: (value) {
-                    _runFilters(value);
-                  },
 
+                  onChanged: (value) => _searchFilter(value),
                   decoration: InputDecoration(
                     disabledBorder: InputBorder.none,
                     prefixIcon: Icon(Icons.search),
@@ -93,22 +112,21 @@ class _search_pageState extends State<search_page> {
             ),
           ),
 
-          check != false
-              ? Expanded(
+          // gamenofilter != null
+               Expanded(
             child: ListView.builder(
-              itemCount: gamefilter?.results?.length ?? 0,
+              itemCount: filteredData?.length ?? 0,
               itemBuilder: (context, index) {
                 return Container(
                   margin: const EdgeInsets.all(8.0),
                   child: InkWell(
                     onTap: () {
-                      String realesed=gamelist?.results?[index].released.toString()??'';
-
+                      String realesed=filteredData?[index]['released'].released.toString()??'';
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                detail(id: gamefilter?.results?[index].id.toString() ?? "0",
+                                detail(id: filteredData?[index]['id'].toString() ?? "0",
                                   date_realesed: realesed,)),
                       );
                     },
@@ -121,7 +139,7 @@ class _search_pageState extends State<search_page> {
                       child: Row(
                         children: [
                           rounded_image(
-                            imageUrl: '${gamefilter?.results?[index].backgroundImage ?? ''}',
+                            imageUrl: '${filteredData?[index]['image'].toString() ?? ''}',
                             width: 80,
                             height: 100,
                           ),
@@ -134,17 +152,17 @@ class _search_pageState extends State<search_page> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(gamefilter?.results![index].slug ?? "Loading...",style: TextStyle(color: Colors.white)),
+                                Text(filteredData?[index]['slug']?? "Loading...",style: TextStyle(color: Colors.white)),
                                 SizedBox(
                                   height: 10,
                                 ),
                                 Text(
-                                    "Release Date : ${DateFormat('yyyy-MM-dd').format(DateTime.parse( gamefilter?.results![0].released.toString() ?? ''))}",style: TextStyle(color: Colors.white)),
+                                    "Release Date : ${DateFormat('yyyy-MM-dd').format(DateTime.parse( filteredData?[index]['released'].toString() ?? ''))}",style: TextStyle(color: Colors.white)),
                                 SizedBox(
                                   height: 10,
                                 ),
                                 Text(
-                                    "Rating : ${gamefilter?.results![index].rating ?? "Loading..."}",style: TextStyle(color: Colors.white)),
+                                    "Rating : ${filteredData?[index]['rating'].toString()?? "Loading..."}",style: TextStyle(color: Colors.white)),
                               ],
                             ),
                           )
@@ -156,64 +174,125 @@ class _search_pageState extends State<search_page> {
               },
             ),
           )
-              : Expanded(
-            child: ListView.builder(
-              itemCount: gamelist?.results?.length ?? 0,
-              itemBuilder: (context, index) {
-                return Container(
-                  margin: const EdgeInsets.all(8.0),
-                  child: InkWell(
-                    onTap: () {
-                      String realesed=gamelist?.results?[index].released.toString()??'';
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                detail(id: gamelist?.results?[index].id.toString() ?? "0", date_realesed: realesed,)),
-                      );
-                    },
-                    child: Container(
-                      height: 100,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: HexColor("#174D75"),
-                      ),
-                      child: Row(
-                        children: [
-                          rounded_image(
-                            imageUrl: '${gamelist?.results?[index].backgroundImage??""}',
-                            width: 120,
-                            height: 100,
-                          ),
-
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(gamelist?.results![index].name ?? "Loading...",style: TextStyle(color: Colors.white),),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                  "Release Date : ${gamelist?.results![index].released ?? "Loading..."}",style: TextStyle(color: Colors.white),),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                  "Rating : ${gamelist?.results![index].rating ?? "Loading..."}",style: TextStyle(color: Colors.white),),
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+         //      : Expanded(
+         //   child: ListView.builder(
+         //     itemCount: allData?.length ?? 0,
+         //     itemBuilder: (context, index) {
+         //       return Container(
+         //         margin: const EdgeInsets.all(8.0),
+         //         child: InkWell(
+         //           onTap: () {
+         //             String realesed=allData?[index]['released'].released.toString()??'';
+         //             Navigator.push(
+         //               context,
+         //               MaterialPageRoute(
+         //                   builder: (context) =>
+         //                       detail(id: allData?[index]['id'].toString() ?? "0",
+         //                         date_realesed: realesed,)),
+         //             );
+         //           },
+         //           child: Container(
+         //             height: 100,
+         //             decoration: BoxDecoration(
+         //               borderRadius: BorderRadius.circular(8),
+         //               color: HexColor("#174D75"),
+         //             ),
+         //             child: Row(
+         //               children: [
+         //                 rounded_image(
+         //                   imageUrl: '${allData?[index]['image'].toString() ?? ''}',
+         //                   width: 80,
+         //                   height: 100,
+         //                 ),
+         //                 SizedBox(
+         //                   width: 20,
+         //                 ),
+         //                 Container(
+         //                   height: 100,
+         //                   child: Column(
+         //                     crossAxisAlignment: CrossAxisAlignment.start,
+         //                     mainAxisAlignment: MainAxisAlignment.center,
+         //                     children: [
+         //                       Text(allData?[index]['slug']?? "Loading...",style: TextStyle(color: Colors.white)),
+         //                       SizedBox(
+         //                         height: 10,
+         //                       ),
+         //                       Text(
+         //                           "Release Date : ${DateFormat('yyyy-MM-dd').format(DateTime.parse( allData?[index]['released'].toString() ?? ''))}",style: TextStyle(color: Colors.white)),
+         //                       SizedBox(
+         //                         height: 10,
+         //                       ),
+         //                       Text(
+         //                           "Rating : ${allData?[index]['rating'].toString()?? "Loading..."}",style: TextStyle(color: Colors.white)),
+         //                     ],
+         //                   ),
+         //                 )
+         //               ],
+         //             ),
+         //           ),
+         //         ),
+         //       );
+         //     },
+         //   ),
+         // )
+          // Expanded(
+          //   child: ListView.builder(
+          //     itemCount: gamelist?.results?.length ?? 0,
+          //     itemBuilder: (context, index) {
+          //       return Container(
+          //         margin: const EdgeInsets.all(8.0),
+          //         child: InkWell(
+          //           onTap: () {
+          //             String realesed=gamelist?.results?[index].released.toString()??'';
+          //             Navigator.push(
+          //               context,
+          //               MaterialPageRoute(
+          //                   builder: (context) =>
+          //                       detail(id: gamelist?.results?[index].id.toString() ?? "0", date_realesed: realesed,)),
+          //             );
+          //           },
+          //           child: Container(
+          //             height: 100,
+          //             decoration: BoxDecoration(
+          //               borderRadius: BorderRadius.circular(8),
+          //               color: HexColor("#174D75"),
+          //             ),
+          //             child: Row(
+          //               children: [
+          //                 rounded_image(
+          //                   imageUrl: '${gamelist?.results?[index].backgroundImage??""}',
+          //                   width: 120,
+          //                   height: 100,
+          //                 ),
+          //
+          //                 SizedBox(
+          //                   width: 20,
+          //                 ),
+          //                 Column(
+          //                   crossAxisAlignment: CrossAxisAlignment.start,
+          //                   mainAxisAlignment: MainAxisAlignment.center,
+          //                   children: [
+          //                     Text(gamelist?.results![index].name ?? "Loading...",style: TextStyle(color: Colors.white),),
+          //                     SizedBox(
+          //                       height: 10,
+          //                     ),
+          //                     Text(
+          //                       "Release Date : ${gamelist?.results![index].released ?? "Loading..."}",style: TextStyle(color: Colors.white),),
+          //                     SizedBox(
+          //                       height: 10,
+          //                     ),
+          //                     Text(
+          //                       "Rating : ${gamelist?.results![index].rating ?? "Loading..."}",style: TextStyle(color: Colors.white),),
+          //                   ],
+          //                 )
+          //               ],
+          //             ),
+          //           ),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
         ],
       ),
     );

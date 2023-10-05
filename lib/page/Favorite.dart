@@ -57,9 +57,9 @@ class _FavoritesState extends State<Favorites> {
         setState(() {});
         await Fav_DB.instance.delete(name);
         await read(); // Tambahkan await di sini
-        Navigator.pop(context); // Pindahkan ini ke atas await read()
-        Navigator.of(context, rootNavigator: true).pop('dialog');
         Navigator.pop(context);
+        Navigator.of(context, rootNavigator: true).pop('dialog');
+        // Navigator.pop(context);
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => Tabbar(halamanke: 0,)));
 
